@@ -1,7 +1,10 @@
 {
   "permissions": {
     "allow": [
-      "Skill(frontend-design)"
+      "Skill(frontend-design)",
+      "Skill(session-intelligence-harvester)",
+      "Skill(skill-creator)",
+      "Skill(skills-proficiency-mapper)"
     ],
     "deny": [],
     "ask": []

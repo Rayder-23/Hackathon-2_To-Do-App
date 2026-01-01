@@ -1,55 +1,69 @@
-# [PROJECT_NAME] Constitution
-<!-- Example: Spec Constitution, TaskFlow Constitution, etc. -->
+<!--
+Sync Impact Report:
+- Version change: N/A → 1.0.0 (initial constitution for todo app)
+- List of modified principles: N/A (new constitution)
+- Added sections: Core Principles (6), Key Standards, Functional Rules, Project Structure, Constraints, Success Criteria, Governance
+- Removed sections: None (new constitution)
+- Templates requiring updates: N/A (initial creation)
+- Follow-up TODOs: [RATIFICATION_DATE] needs to be set
+-->
+# In-Memory Todo Console Application Constitution
 
 ## Core Principles
 
-### [PRINCIPLE_1_NAME]
-<!-- Example: I. Library-First -->
-[PRINCIPLE_1_DESCRIPTION]
-<!-- Example: Every feature starts as a standalone library; Libraries must be self-contained, independently testable, documented; Clear purpose required - no organizational-only libraries -->
+### Spec-driven Implementation
+All system behavior must be derived from written specifications. Implementation must strictly follow defined requirements without adding features or behaviors not specified.
 
-### [PRINCIPLE_2_NAME]
-<!-- Example: II. CLI Interface -->
-[PRINCIPLE_2_DESCRIPTION]
-<!-- Example: Every library exposes functionality via CLI; Text in/out protocol: stdin/args → stdout, errors → stderr; Support JSON + human-readable formats -->
+### Deterministic Logic
+Identical inputs must always yield identical results. The application must behave predictably with no random or time-dependent behavior that could affect functionality.
 
-### [PRINCIPLE_3_NAME]
-<!-- Example: III. Test-First (NON-NEGOTIABLE) -->
-[PRINCIPLE_3_DESCRIPTION]
-<!-- Example: TDD mandatory: Tests written → User approved → Tests fail → Then implement; Red-Green-Refactor cycle strictly enforced -->
+### Simplicity and Clarity
+Prefer straightforward, readable designs over complex abstractions. Code must follow clean code conventions with clear naming and small focused functions that are easy to understand and maintain.
 
-### [PRINCIPLE_4_NAME]
-<!-- Example: IV. Integration Testing -->
-[PRINCIPLE_4_DESCRIPTION]
-<!-- Example: Focus areas requiring integration tests: New library contract tests, Contract changes, Inter-service communication, Shared schemas -->
+### Separation of Concerns
+Data models, business logic, and user interaction must be clearly isolated. Each component has a single responsibility and clear interfaces between layers.
 
-### [PRINCIPLE_5_NAME]
-<!-- Example: V. Observability, VI. Versioning & Breaking Changes, VII. Simplicity -->
-[PRINCIPLE_5_DESCRIPTION]
-<!-- Example: Text I/O ensures debuggability; Structured logging required; Or: MAJOR.MINOR.BUILD format; Or: Start simple, YAGNI principles -->
+### Forward Compatibility
+Design choices must not prevent future persistence or frontend integration. Architecture must allow for extensions without requiring fundamental rewrites.
 
-### [PRINCIPLE_6_NAME]
+### Error Handling and User Experience
+Error handling must be defensive and user-friendly; invalid input must never crash the program. The application must provide clear, helpful feedback to users.
 
+## Key Standards
+- The application is a menu-driven, console-based program
+- Task data is stored strictly in memory and is discarded on application exit
+- Error handling must be defensive and user-friendly; invalid input must never crash the program
+- Python code must follow clean code conventions (clear naming, small focused functions)
+- uv must be used as the project's Python environment and dependency manager
+- The project must be runnable using uv without additional tooling assumptions
 
-[PRINCIPLE__DESCRIPTION]
+## Functional Rules
+- A task consists of: An auto-incremented integer ID, a required non-empty title, an optional description, and a boolean completion status
+- Task IDs start at 1, increment monotonically, and are never reused within a single run
+- Tasks are listed in creation order
+- Updating a task allows the user to cancel the operation before completion
+- Marking a task complete toggles its completion state (complete ↔ incomplete)
+- Selecting the exit option terminates the application immediately
 
-## [SECTION_2_NAME]
-<!-- Example: Additional Constraints, Security Requirements, Performance Standards, etc. -->
+## Project Structure
+- All Python source code must reside under a backend/src directory
+- Only Python source files are placed inside backend/src
+- No non-Python project files (documentation, configs, specs) reside inside backend/src
+- The backend codebase must be organized to allow future frontend integration without restructuring
 
-[SECTION_2_CONTENT]
-<!-- Example: Technology stack requirements, compliance standards, deployment policies, etc. -->
+## Constraints
+- Language: Python 3.13+
+- Interface: console only
+- Storage: in-memory only
+- Scope: basic todo functionality (add, view, update, delete, mark complete)
 
-## [SECTION_3_NAME]
-<!-- Example: Development Workflow, Review Process, Quality Gates, etc. -->
-
-[SECTION_3_CONTENT]
-<!-- Example: Code review requirements, testing gates, deployment approval process, etc. -->
+## Success Criteria
+- All defined features behave exactly as specified
+- User interactions are clear, predictable, and error-tolerant
+- The application runs successfully via uv from the command line
+- The backend structure is clean, minimal, and extensible
 
 ## Governance
-<!-- Example: Constitution supersedes all other practices; Amendments require documentation, approval, migration plan -->
+This constitution governs all development decisions for the todo application. All code changes must align with these principles. Amendments to this constitution require explicit documentation of the change and its rationale.
 
-[GOVERNANCE_RULES]
-<!-- Example: All PRs/reviews must verify compliance; Complexity must be justified; Use [GUIDANCE_FILE] for runtime development guidance -->
-
-**Version**: [CONSTITUTION_VERSION] | **Ratified**: [RATIFICATION_DATE] | **Last Amended**: [LAST_AMENDED_DATE]
-<!-- Example: Version: 2.1.1 | Ratified: 2025-06-13 | Last Amended: 2025-07-16 -->
+**Version**: 1.0.0 | **Ratified**: TODO(RATIFICATION_DATE) | **Last Amended**: 2026-01-01
