@@ -82,20 +82,32 @@ Phase II extends Phase I concepts without breaking domain logic. The system must
 - Better Auth runs in the TypeScript frontend environment
 - Better Auth must be configured to issue JWT tokens
 - JWT tokens are the sole mechanism for identity transfer between frontend and backend
-- Every API request must include: Authorization: Bearer <JWT>
+- JWT tokens must be signed using a shared secret
+- The shared secret is provided via the environment variable `BETTER_AUTH_SECRET`
+- Both frontend (Better Auth) and backend (FastAPI) must load the same `BETTER_AUTH_SECRET`
+- The shared secret must never be hardcoded or committed to source control
+- Every API request must include:
+  - Authorization: Bearer <JWT>
 - Backend must:
-  - Verify JWT signature and expiry
-  - Treat JWT claims as authoritative
-  - Reject requests where the URL user_id does not match the JWT user identity
-- Requests without valid JWTs receive 401 Unauthorized
-- Ownership violations receive 403 Forbidden
+  - Extract JWT from the Authorization header
+  - Verify JWT signature using `BETTER_AUTH_SECRET`
+  - Verify JWT expiry and standard claims
+  - Treat verified JWT claims as authoritative identity
+  - Reject requests where the URL `user_id` does not match the authenticated JWT user identity
+- Requests without a valid JWT receive 401 Unauthorized
+- Requests with invalid, expired, or tampered JWTs receive 401 Unauthorized
+- Authenticated requests attempting cross-user access receive 403 Forbidden
 
 ## API Contract Standards
 - RESTful endpoints for task management
+- API endpoint paths remain stable (e.g., `/api/{user_id}/tasks`)
+- Authentication does not change endpoint structure, only request requirements
 - All task queries and mutations must be scoped to the authenticated user
 - Task ownership is enforced at the database query level
-- Endpoint structure remains stable, but behavior is user-scoped after authentication
-- Zero-trust approach: backend never trusts client-provided identity without JWT verification
+- Backend must filter all responses to include only data owned by the authenticated user
+- Zero-trust approach:
+  - Backend never trusts client-provided identity
+  - Backend derives user identity exclusively from verified JWT claims
 
 ## MCP Documentation Grounding Standards
 - Any implementation involving external documentation must be grounded in authoritative MCP sources
