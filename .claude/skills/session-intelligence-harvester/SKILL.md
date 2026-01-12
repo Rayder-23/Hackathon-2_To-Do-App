@@ -302,6 +302,32 @@ CLASSIFICATION:
 **Updates Applied**:
 1. CLAUDE.md: Added Step 1 to read chapter-index.md with specific extraction requirements
 
+## Quick Validation Checklist
+
+For rapid assessment before completing the harvest, check these critical items:
+
+### High Priority Items
+- [ ] Session analysis completed (corrections, patterns, classification)
+- [ ] Target files read before editing (no speculation about structure)
+- [ ] All edits applied using Edit tool (not just proposed)
+- [ ] Routing to correct RII components verified
+- [ ] PHR created documenting the harvest
+
+### Medium Priority Items
+- [ ] Edits match target file's style and structure
+- [ ] Cross-references added where patterns appear in multiple files
+- [ ] Commit message created with descriptive summary
+- [ ] Summary generated showing all updates applied
+
+### Low Priority Items
+- [ ] Validation checklist from Step 5 completed
+- [ ] Canonical sources checked for format-related learnings
+- [ ] No duplicate information exists in target files
+
+**If 8+ high/medium priority items checked**: Likely ready for completion
+**If 5-7 checked**: Review before completing
+**If <5 checked**: Further work needed
+
 ## Self-Monitoring
 
 Before marking harvest complete, verify you have:

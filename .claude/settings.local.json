@@ -4,7 +4,14 @@
       "Skill(frontend-design)",
       "Skill(session-intelligence-harvester)",
       "Skill(skill-creator)",
-      "Skill(skills-proficiency-mapper)"
+      "Skill(skills-proficiency-mapper)",
+      "mcp__better-auth__search",
+      "mcp__context7__resolve-library-id",
+      "mcp__context7__query-docs",
+      "Bash(python tests/test_api.py)",
+      "Bash(python tests/test_api_endpoints_external.py)",
+      "Skill(skill-validator)",
+      "Skill(skill-creator-pro)"
     ],
     "deny": [],
     "ask": []
