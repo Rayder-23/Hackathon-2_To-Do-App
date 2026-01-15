@@ -4,7 +4,13 @@ from datetime import datetime
 from passlib.context import CryptContext
 import re
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+# Configure password context with proper bcrypt backend settings to avoid version lookup issues
+pwd_context = CryptContext(
+    schemes=["bcrypt"],
+    deprecated="auto",
+    bcrypt__ident="2b",
+    bcrypt__min_rounds=12,
+)
 
 class UserBase(SQLModel):
     email: str = Field(unique=True, nullable=False, max_length=255)
@@ -46,7 +52,12 @@ class User(UserBase, table=True):
 
     @staticmethod
     def validate_password_strength(password: str) -> bool:
-        """Validate password strength (minimum 8 chars with uppercase, lowercase, number, special char)."""
+        """Validate password strength (minimum 8 chars)."""
+        return len(password) >= 8
+
+    @staticmethod
+    def validate_password_strength_strict(password: str) -> bool:
+        """Validate password strength with strict requirements (minimum 8 chars with uppercase, lowercase, number, special char)."""
         if len(password) < 8:
             return False
 

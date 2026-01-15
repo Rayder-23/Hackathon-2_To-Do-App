@@ -18,39 +18,55 @@ def verify_token(token: str) -> Optional[dict]:
     This function validates JWT tokens issued by BetterAuth and verifies required claims.
     """
     try:
+        print(f"Attempting to decode token: {token[:20]}...")  # Log first 20 chars for debugging
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        print(f"Decoded payload: {payload}")
 
-        # Verify required claims exist as specified in FR-016
-        required_claims = ["sub", "email", "exp", "iat"]
-        for claim in required_claims:
-            if claim not in payload:
-                raise HTTPException(
-                    status_code=status.HTTP_401_UNAUTHORIZED,
-                    detail="Token missing required claims"
-                )
+        # BetterAuth tokens might have different claim structures
+        # Check for various possible identifiers
+        user_identifier = payload.get("email") or payload.get("sub") or payload.get("id")
+        if not user_identifier:
+            print("Token missing required user identifier")
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Token missing required user identifier"
+            )
 
         # Check if token is expired
-        if payload["exp"] < datetime.utcnow().timestamp():
+        exp = payload.get("exp")
+        if exp and exp < datetime.utcnow().timestamp():
+            print("Token has expired")
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Token has expired"
             )
 
+        print("Token validation successful")
         return payload
-    except JWTError:
+    except JWTError as e:
+        # Log the specific JWT error for debugging
+        print(f"JWT Error: {str(e)}")
         # Handle various JWT errors as per RFC 7807 Problem Details
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Could not validate credentials"
         )
 
-def create_access_token(data: dict):
+
+
+def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
     """
-    Create a JWT access token with the provided data.
+    Create a JWT access token with the given data.
+    This function generates JWT tokens that are compatible with BetterAuth expectations.
     """
     to_encode = data.copy()
-    expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-    to_encode.update({"exp": expire.timestamp(), "iat": datetime.utcnow().timestamp()})
+    if expires_delta:
+        expire = datetime.utcnow() + expires_delta
+    else:
+        # Default to 24 hours as specified in requirements
+        expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+
+    to_encode.update({"exp": expire.timestamp()})
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
 

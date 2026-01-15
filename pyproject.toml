@@ -4,6 +4,7 @@ version = "0.1.0"
 description = "An in-memory todo console application"
 requires-python = ">=3.13"
 dependencies = [
+    "bcrypt==4.0.1",
     "fastapi[standard]>=0.128.0",
     "passlib[bcrypt]>=1.7.4",
     "psycopg2-binary>=2.9.11",
