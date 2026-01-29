@@ -1,34 +1,46 @@
-# Specification Quality Checklist: 2.5-auth-alignment: Backend–Frontend Authentication Alignment
+# Validation Checklist for Auth Alignment Specification
 
-**Purpose**: Validate specification completeness and quality before proceeding to planning
-**Created**: 2026-01-29
-**Feature**: [Link to spec.md](../2.5-auth-alignment/spec.md)
+## Completeness Check
+- [ ] JWT Claims Contract clearly defines required claims (`sub`, `exp`, `iat`)
+- [ ] JWT Claims Contract clearly defines optional claims (`email`, `name`, `iss`, `aud`)
+- [ ] Functional requirements (FR-001 to FR-010) are complete and testable
+- [ ] Non-functional requirements (NFR-001 to NFR-003) are complete and measurable
+- [ ] Edge cases (EC-001 to EC-006) are properly documented
+- [ ] Success criteria (SC-001 to SC-007) are specific and measurable
+- [ ] Constraints are specific and enforceable
 
-## Content Quality
+## Testability Check
+- [ ] All acceptance scenarios have clear Given/When/Then structure
+- [ ] Performance requirements have specific measurements and benchmarks
+- [ ] Error handling scenarios have specific response codes and messages
+- [ ] Each functional requirement can be independently tested
+- [ ] Success criteria can be objectively measured
 
-- [ ] No implementation details (languages, frameworks, APIs)
-- [ ] Focused on user value and business needs
-- [ ] Written for non-technical stakeholders
-- [ ] All mandatory sections completed
+## Consistency Check
+- [ ] All JWT validation follows the same pattern and standards
+- [ ] Error responses are consistent across different failure scenarios
+- [ ] User identity derivation always uses the `sub` claim
+- [ ] Authorization decisions are consistently based on JWT claims
+- [ ] Clock skew tolerance is consistently applied (5 seconds)
 
-## Requirement Completeness
+## Security Check
+- [ ] JWT signature verification is mandatory for all requests
+- [ ] Token expiration is validated with appropriate tolerance
+- [ ] User identity is derived exclusively from verified JWT claims
+- [ ] Access control prevents users from accessing others' resources
+- [ ] Authentication failures are logged for security monitoring
+- [ ] Error messages don't leak sensitive information
 
-- [ ] No [NEEDS CLARIFICATION] markers remain
-- [ ] Requirements are testable and unambiguous
-- [ ] Success criteria are measurable
-- [ ] Success criteria are technology-agnostic (no implementation details)
-- [ ] All acceptance scenarios are defined
-- [ ] Edge cases are identified
-- [ ] Scope is clearly bounded
-- [ ] Dependencies and assumptions identified
+## Implementation Feasibility
+- [ ] Shared secret management is clearly defined
+- [ ] Performance requirements are achievable with reasonable hardware
+- [ ] All dependencies are properly identified
+- [ ] No circular dependencies exist between components
+- [ ] Error handling paths are clearly defined
 
-## Feature Readiness
-
-- [ ] All functional requirements have clear acceptance criteria
-- [ ] User scenarios cover primary flows
-- [ ] Feature meets measurable outcomes defined in Success Criteria
-- [ ] No implementation details leak into specification
-
-## Notes
-
-- Items marked incomplete require spec updates before `/sp.clarify` or `/sp.plan`
+## Architecture Alignment
+- [ ] Frontend (Better Auth) handles authentication flows
+- [ ] Backend acts as JWT-verifying resource server
+- [ ] No token issuance or refresh logic in backend
+- [ ] Clear separation of responsibilities between frontend/backend
+- [ ] Authentication boundaries are well-defined

@@ -1,0 +1,249 @@
+openapi: 3.0.0
+info:
+  title: Todo API with JWT Authentication
+  version: 1.0.0
+  description: API for managing todos with JWT-based authentication
+
+paths:
+  /api/users/{user_id}/tasks:
+    get:
+      summary: Get tasks for authenticated user
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: User ID (must match JWT sub claim)
+      responses:
+        '200':
+          description: Successfully retrieved tasks
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  tasks:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Task'
+        '401':
+          description: Unauthorized - Invalid or missing JWT
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Forbidden - JWT sub doesn't match user_id
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      security:
+        - bearerAuth: []
+
+    post:
+      summary: Create a new task for authenticated user
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: User ID (must match JWT sub claim)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTaskRequest'
+      responses:
+        '201':
+          description: Task created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+        '401':
+          description: Unauthorized - Invalid or missing JWT
+        '403':
+          description: Forbidden - JWT sub doesn't match user_id
+      security:
+        - bearerAuth: []
+
+  /api/users/{user_id}/tasks/{task_id}:
+    get:
+      summary: Get a specific task for authenticated user
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: User ID (must match JWT sub claim)
+        - name: task_id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: Task ID
+      responses:
+        '200':
+          description: Successfully retrieved task
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+        '401':
+          description: Unauthorized - Invalid or missing JWT
+        '403':
+          description: Forbidden - JWT sub doesn't match user_id
+        '404':
+          description: Task not found
+      security:
+        - bearerAuth: []
+
+    put:
+      summary: Update a specific task for authenticated user
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: User ID (must match JWT sub claim)
+        - name: task_id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: Task ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateTaskRequest'
+      responses:
+        '200':
+          description: Task updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+        '401':
+          description: Unauthorized - Invalid or missing JWT
+        '403':
+          description: Forbidden - JWT sub doesn't match user_id
+        '404':
+          description: Task not found
+      security:
+        - bearerAuth: []
+
+    delete:
+      summary: Delete a specific task for authenticated user
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: User ID (must match JWT sub claim)
+        - name: task_id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: Task ID
+      responses:
+        '204':
+          description: Task deleted successfully
+        '401':
+          description: Unauthorized - Invalid or missing JWT
+        '403':
+          description: Forbidden - JWT sub doesn't match user_id
+        '404':
+          description: Task not found
+      security:
+        - bearerAuth: []
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      description: JWT token issued by Better Auth
+
+  schemas:
+    Task:
+      type: object
+      required:
+        - id
+        - title
+        - completed
+        - user_id
+      properties:
+        id:
+          type: integer
+          description: Unique task identifier
+        title:
+          type: string
+          description: Task title
+        description:
+          type: string
+          description: Optional task description
+        completed:
+          type: boolean
+          description: Whether the task is completed
+        user_id:
+          type: string
+          description: ID of the user who owns this task
+        created_at:
+          type: string
+          format: date-time
+          description: When the task was created
+        updated_at:
+          type: string
+          format: date-time
+          description: When the task was last updated
+
+    CreateTaskRequest:
+      type: object
+      required:
+        - title
+      properties:
+        title:
+          type: string
+          description: Task title
+        description:
+          type: string
+          description: Optional task description
+        completed:
+          type: boolean
+          default: false
+          description: Whether the task is completed
+
+    UpdateTaskRequest:
+      type: object
+      properties:
+        title:
+          type: string
+          description: New task title
+        description:
+          type: string
+          description: New task description
+        completed:
+          type: boolean
+          description: New completion status
+
+    Error:
+      type: object
+      required:
+        - detail
+      properties:
+        detail:
+          type: string
+          description: Error message
+
+security:
+  - bearerAuth: []
