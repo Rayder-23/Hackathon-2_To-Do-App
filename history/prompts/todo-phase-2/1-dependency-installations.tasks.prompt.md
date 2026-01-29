@@ -5,7 +5,7 @@ stage: tasks
 date_iso: "2026-01-11"
 surface: agent
 model: claude-sonnet-4-5-20250929
-feature: "2-todo-phase-2"
+feature: "todo-phase-2"
 branch: main
 user: Rayder
 command: "/sp.phr"

@@ -4,7 +4,7 @@ title: Testing and Validation - Todo App Phase II
 stage: misc
 date: 2026-01-12
 model: claude-sonnet-4-5-20250929
-feature: "2-todo-phase-2"
+feature: "todo-phase-2"
 branch: main
 user: Rayder
 command: Testing and validation tasks

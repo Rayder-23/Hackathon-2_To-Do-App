@@ -5,7 +5,7 @@ stage: general
 date_iso: 2026-01-12
 surface: agent
 model: sonnet-4-5
-feature: "2-todo-phase-2"
+feature: "todo-phase-2"
 branch: main
 user: Rayder
 command: todo-app-implementation
