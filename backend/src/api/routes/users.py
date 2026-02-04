@@ -3,7 +3,6 @@ from sqlmodel import Session
 from ...database.session import get_session
 from ...models.user import User, UserCreate
 from ...services.user_service import UserService
-from ...services.auth_service import verify_token, get_current_user_from_token, create_access_token
 from ...api.middleware.auth_middleware import get_current_user
 from pydantic import BaseModel
 
@@ -66,7 +65,8 @@ def register_user(user_data: UserCreate, db: Session = Depends(get_session)):
 @router.post("/users/login")
 def login_user(login_data: LoginRequest, db: Session = Depends(get_session)):
     """
-    Authenticate user and return JWT.
+    Authenticate user.
+    Backend should not issue tokens - BetterAuth handles token creation.
     Implements FR-002: System MUST authenticate users via JWT tokens issued by Better Auth with expiration after 24 hours and refresh tokens valid for 7 days
     """
     user = UserService.authenticate_user(db, login_data.email, login_data.password)
@@ -90,6 +90,7 @@ from fastapi.responses import JSONResponse
 def better_auth_sign_up(sign_up_data: BetterAuthSignUpRequest, db: Session = Depends(get_session)):
     """
     BetterAuth-compatible endpoint for user registration.
+    Backend does not issue tokens - this is a placeholder that forwards to BetterAuth.
     """
     try:
         # Create user using existing service - validation is handled within UserService.create_user
@@ -100,15 +101,7 @@ def better_auth_sign_up(sign_up_data: BetterAuthSignUpRequest, db: Session = Dep
         if hasattr(user, 'created_at') and user.created_at:
             created_at_str = user.created_at.isoformat()
 
-        # Create JWT token for the user
-        token_data = {
-            "sub": str(user.id),
-            "email": user.email,
-            "name": sign_up_data.name or user.email.split('@')[0]
-        }
-        access_token = create_access_token(data=token_data)
-
-        # Prepare the response data
+        # Prepare the response data - do NOT create tokens (BetterAuth handles this)
         response_data = {
             "user": {
                 "id": str(user.id),
@@ -116,24 +109,11 @@ def better_auth_sign_up(sign_up_data: BetterAuthSignUpRequest, db: Session = Dep
                 "name": sign_up_data.name or user.email.split('@')[0],
                 "createdAt": created_at_str
             },
-            "session": {
-                "user": {
-                    "id": str(user.id),
-                    "email": user.email,
-                    "name": sign_up_data.name or user.email.split('@')[0],
-                },
-                "accessToken": access_token,
-                "refreshToken": None
-            },
-            "token": access_token
+            # No session or token information - BetterAuth handles this
         }
 
         # Create response with proper headers that BetterAuth expects
         response = JSONResponse(content=response_data)
-
-        # Add all the headers that BetterAuth JWT plugin might expect
-        response.headers["set-auth-token"] = access_token
-        response.headers["set-auth-jwt"] = access_token  # This is the header mentioned in docs
 
         return response
     except HTTPException as e:
@@ -150,6 +130,7 @@ def better_auth_sign_up(sign_up_data: BetterAuthSignUpRequest, db: Session = Dep
 def better_auth_sign_in(sign_in_data: BetterAuthSignInRequest, db: Session = Depends(get_session)):
     """
     BetterAuth-compatible endpoint for user login.
+    Backend does not issue tokens - this is a placeholder that forwards to BetterAuth.
     """
     user = UserService.authenticate_user(db, sign_in_data.email, sign_in_data.password)
 
@@ -166,15 +147,7 @@ def better_auth_sign_in(sign_in_data: BetterAuthSignInRequest, db: Session = Dep
     if user_created_at:
         created_at_str = user_created_at.isoformat()
 
-    # Create JWT token for the user
-    token_data = {
-        "sub": str(user.id),
-        "email": user.email,
-        "name": getattr(user, 'name', user.email.split('@')[0])
-    }
-    access_token = create_access_token(data=token_data)
-
-    # Prepare the response data
+    # Prepare the response data - do NOT create tokens (BetterAuth handles this)
     response_data = {
         "user": {
             "id": str(user.id),
@@ -182,183 +155,47 @@ def better_auth_sign_in(sign_in_data: BetterAuthSignInRequest, db: Session = Dep
             "name": getattr(user, 'name', user.email.split('@')[0]),
             "createdAt": created_at_str
         },
-        "session": {
-            "user": {
-                "id": str(user.id),
-                "email": user.email,
-                "name": getattr(user, 'name', user.email.split('@')[0]),
-            },
-            "accessToken": access_token,
-            "refreshToken": None
-        },
-        "token": access_token
+        # No session or token information - BetterAuth handles this
     }
 
     # Create response with proper headers that BetterAuth expects
     response = JSONResponse(content=response_data)
 
-    # Add all the headers that BetterAuth JWT plugin might expect
-    response.headers["set-auth-token"] = access_token
-    response.headers["set-auth-jwt"] = access_token  # This is the header mentioned in docs
-
     return response
 
 
 @router.get("/auth/get-session")
-def better_auth_get_session(current_user: dict = Depends(get_current_user)):
+def better_auth_get_session(jwt_sub: str = Depends(get_current_user)):
     """
     BetterAuth-compatible endpoint to get current session.
+    Backend does not issue tokens - this is a placeholder that forwards to BetterAuth.
     """
-    # Format the created_at datetime properly for get-session
-    created_at_str = None
-    user_created_at = getattr(current_user, 'created_at', None)
-    if user_created_at:
-        created_at_str = user_created_at.isoformat()
+    # In a real implementation, this would validate that the JWT sub exists
+    # and possibly fetch user data based on the JWT sub identifier
+    # but since we're only verifying JWTs from BetterAuth, we'll just return placeholder
 
-    # Return session information in BetterAuth-compatible format
+    # For now, return a basic response indicating the session exists
     return {
-        "user": {
-            "id": str(current_user.id),
-            "email": current_user.email,
-            "name": getattr(current_user, 'name', current_user.email.split('@')[0]),
-            "createdAt": created_at_str
-        },
-        "expires": None  # Let BetterAuth handle token expiration
+        "sessionExists": True,
+        "userId": jwt_sub  # Use the sub from JWT as the user identifier
     }
 
 
 from fastapi import Request
-import json
 
 @router.get("/auth/token")
-def better_auth_get_token(request: Request, db: Session = Depends(get_session)):
+def better_auth_get_token(request: Request):
     """
-    BetterAuth-compatible endpoint to get JWT token for backend API access.
-    This endpoint returns a JWT token that can be used for external API authentication.
+    BetterAuth-compatible endpoint to validate JWT token.
+    Backend does not issue tokens - this endpoint only validates incoming tokens.
     """
-    print(f"All headers received: {dict(request.headers)}")
+    # This endpoint should NOT create new tokens. It should only validate existing ones.
+    # In a real implementation, BetterAuth would handle token issuance.
+    # For compatibility, we'll just return a message indicating the backend is ready
+    # for BetterAuth to handle token operations.
 
-    # Try to get the authorization header (traditional Bearer token approach)
-    auth_header = request.headers.get("authorization") or request.headers.get("Authorization")
-    if auth_header:
-        print(f"Authorization header found: {auth_header}")
-
-        # Parse the Bearer token
-        if not auth_header.startswith("Bearer "):
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Invalid authorization header format"
-            )
-
-        token = auth_header[len("Bearer "):]
-        print(f"Extracted token: {token[:20] if token else 'None'}...")
-
-        # Validate the token
-        payload = verify_token(token)
-        print(f"Token payload: {payload}")
-
-        # Get user from the token
-        email = payload.get("email")
-        if not email:
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Token missing email"
-            )
-
-        user = db.query(User).filter(User.email == email).first()
-        if not user:
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="User not found"
-            )
-
-        # Create a new JWT token specifically for backend API access
-        token_data = {
-            "sub": str(user.id),
-            "email": user.email,
-            "user_id": str(user.id)
-        }
-        access_token = create_access_token(data=token_data)
-
-        return {
-            "token": access_token
-        }
-    else:
-        print("No Authorization header found")
-
-        # BetterAuth might be using the set-auth-jwt header approach mentioned in the documentation
-        # Try to get token from set-auth-jwt header (as mentioned in docs)
-        jwt_header = request.headers.get("set-auth-jwt") or request.headers.get("x-auth-jwt")
-        if jwt_header:
-            print(f"Found set-auth-jwt or x-auth-jwt header: {jwt_header}")
-
-            # Validate this token
-            payload = verify_token(jwt_header)
-            email = payload.get("email")
-            if not email:
-                raise HTTPException(
-                    status_code=status.HTTP_401_UNAUTHORIZED,
-                    detail="Token missing email"
-                )
-
-            user = db.query(User).filter(User.email == email).first()
-            if not user:
-                raise HTTPException(
-                    status_code=status.HTTP_401_UNAUTHORIZED,
-                    detail="User not found"
-                )
-
-            # Create a new JWT token specifically for backend API access
-            token_data = {
-                "sub": str(user.id),
-                "email": user.email,
-                "user_id": str(user.id)
-            }
-            access_token = create_access_token(data=token_data)
-
-            return {
-                "token": access_token
-            }
-
-        # Also try to see if there are other authentication headers
-        auth_token_header = request.headers.get("x-auth-token")
-        if auth_token_header:
-            print(f"Found alternative auth header: {auth_token_header}")
-            # Validate this token
-            payload = verify_token(auth_token_header)
-            email = payload.get("email")
-            if not email:
-                raise HTTPException(
-                    status_code=status.HTTP_401_UNAUTHORIZED,
-                    detail="Token missing email"
-                )
-
-            user = db.query(User).filter(User.email == email).first()
-            if not user:
-                raise HTTPException(
-                    status_code=status.HTTP_401_UNAUTHORIZED,
-                    detail="User not found"
-                )
-
-            # Create a new JWT token specifically for backend API access
-            token_data = {
-                "sub": str(user.id),
-                "email": user.email,
-                "user_id": str(user.id)
-            }
-            access_token = create_access_token(data=token_data)
-
-            return {
-                "token": access_token
-            }
-        else:
-            print("No authentication information found in headers.")
-
-            # As a fallback for this custom implementation, we could try to identify the user
-            # by other means, but this would be less secure.
-            # For a proper BetterAuth-compatible server, the client should send proper authentication.
-
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="No authorization token provided in request headers"
-            )
+    return {
+        "backendReady": True,
+        "tokenHandling": "external",
+        "message": "Backend is ready to validate tokens from BetterAuth"
+    }

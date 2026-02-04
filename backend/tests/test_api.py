@@ -51,25 +51,22 @@ def test_user_registration_flow():
     # Register a new user
     user_data = {
         "email": "testuser@example.com",
-        "password": "TestPassword123!",
-        "confirmPassword": "TestPassword123!"
+        "password": "TestPassword123!"
     }
 
     response = client.post("/api/users/register", json=user_data)
-    # This should work if the users endpoint exists
-    if response.status_code in [200, 201]:
-        data = response.json()
-        assert "user" in data
-        assert "jwt" in data
-        print("User registration flow test passed!")
-    else:
-        print(f"User registration endpoint may not exist yet (status: {response.status_code}), skipping...")
+    # Should return 200 with user data (no JWT token issued by backend)
+    assert response.status_code in [200, 201, 409]  # 409 if user already exists
+    data = response.json()
+    # Backend should return user data without JWT (BetterAuth handles that)
+    assert "id" in data or "detail" in data  # Either user data or error response
+    print("User registration flow test passed!")
 
 def test_task_operations():
     """Test basic task operations if user exists."""
     # This test requires authentication, so we'll just verify endpoints exist
     # For now, just check if the routes exist (will return 401/403 without auth)
-    response = client.get("/api/1/tasks")  # Try with dummy user ID
+    response = client.get("/api/1/tasks")  # Try with dummy user ID (now treated as string)
     # Should return 401 (unauthorized) rather than 404 (not found)
     assert response.status_code in [401, 403, 404]  # Accept any of these as route exists
     print("Task endpoints accessibility test passed!")

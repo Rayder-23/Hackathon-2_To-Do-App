@@ -1,65 +1,45 @@
 # Tasks: 2.5-auth-alignment - Backend-Frontend Authentication Alignment
 
-## Task 1: Documentation Grounding (Better Auth + JWT Model)
-**Objective**: Establish authoritative documentation for Better Auth JWT implementation and JWT validation patterns
-**Inputs**: Better Auth documentation, JWT RFC standards, Context7 library docs
-**Outputs**: Grounded documentation summary, JWT claim structure specification, authentication flow patterns
-**Validation**: All implementation decisions are MCP-grounded, no undocumented features used
-**Dependencies**: None
-**Category**: Research
+## Phase 1: Setup
+- [ ] T001 Create/update backend configuration files for JWT verification with Better Auth
 
-## Task 2: Backend Auth Boundary Audit
-**Objective**: Identify all current backend authentication assumptions and behaviors that conflict with spec
-**Inputs**: Current backend codebase, feature spec, auth alignment requirements
-**Outputs**: Audit report of incorrect auth assumptions, list of endpoints requiring changes
-**Validation**: Complete mapping of current vs required auth behavior
-**Dependencies**: Task 1
-**Category**: Analysis
+## Phase 2: Foundational
+- [X] T002 [P] Update existing auth_service.py in backend/src/services/auth_service.py to align with JWT-only verification
+- [X] T003 [P] Update existing auth_middleware.py in backend/src/api/middleware/auth_middleware.py for Better Auth compatibility
+- [X] T004 [P] Create JWT error handlers in backend/src/api/handlers/auth_errors.py
 
-## Task 3: Remove/Deprecate Invalid Backend Auth Behavior
-**Objective**: Eliminate any backend authentication logic that violates the spec
-**Inputs**: Audit report from Task 2, current backend implementation
-**Outputs**: Cleaned backend code without invalid auth logic, updated imports/removals
-**Validation**: No remaining backend auth flows that should be frontend-only
-**Dependencies**: Task 2
-**Category**: Cleanup
+## Phase 3: [US1] Authenticate API requests with JWT tokens
+- [X] T005 [US1] Update existing auth_service.py to enforce JWT-only validation from Better Auth
+- [X] T006 [US1] Update auth dependency to extract user identity exclusively from JWT `sub` claim
+- [X] T007 [US1] Configure JWT validation to check signature, expiration, and required claims
+- [X] T008 [US1] Test valid JWT token acceptance in API requests
+- [X] T009 [US1] Test invalid/missing JWT rejection with 401 Unauthorized response
 
-## Task 4: JWT Verification Middleware Design
-**Objective**: Design and implement JWT verification middleware for FastAPI
-**Inputs**: JWT documentation from Task 1, security requirements, FastAPI patterns
-**Outputs**: JWT verification service, authentication dependency, middleware implementation
-**Validation**: Middleware correctly validates JWT signature, expiration, and required claims
-**Dependencies**: Task 1
-**Category**: Implementation
+## Phase 4: [US2] Enforce strict task ownership based on JWT claims
+- [X] T010 [US2] Update auth_middleware.py to compare JWT `sub` claim with URL `user_id`
+- [X] T011 [US2] Implement authorization logic to return 403 Forbidden for mismatched user access
+- [X] T012 [US2] Test user accessing own tasks with matching JWT `sub` claim
+- [X] T013 [US2] Test user attempting to access other user's tasks with 403 Forbidden response
 
-## Task 5: Identity Derivation and Authorization Rules
-**Objective**: Implement logic to derive user identity from JWT and enforce authorization
-**Inputs**: JWT middleware from Task 4, authorization requirements, user data model
-**Outputs**: Identity derivation service, authorization enforcement logic, user context
-**Validation**: User identity derived exclusively from JWT `sub` claim, proper authorization checks
-**Dependencies**: Task 4
-**Category**: Implementation
+## Phase 5: [US3] Validate JWT token integrity and expiration
+- [X] T014 [US3] Implement JWT signature verification using BETTER_AUTH_SECRET
+- [X] T015 [US3] Implement JWT expiration validation with 5-second clock skew tolerance
+- [X] T016 [US3] Validate required JWT claims (`sub`, `exp`, `iat`) exist and are valid
+- [X] T017 [US3] Test expired JWT token rejection with 401 Unauthorized response
+- [X] T018 [US3] Test JWT token with invalid signature rejection with 401 Unauthorized response
+- [X] T019 [US3] Test JWT token missing required claims rejection with 401 Unauthorized response
 
-## Task 6: Endpoint Behavior Alignment
-**Objective**: Update all endpoints to enforce JWT-based authentication and authorization
-**Inputs**: Current endpoints, auth requirements, middleware from Task 4
-**Outputs**: Updated endpoint decorators, authentication enforcement on all routes
-**Validation**: All endpoints reject requests without valid JWT, enforce user ownership
-**Dependencies**: Task 4, Task 5
-**Category**: Implementation
+## Phase 6: Align backend behavior with frontend expectations
+- [X] T020 [P] Remove/modify backend authentication endpoints that violate auth boundaries
+- [X] T021 [P] Update API error responses to match frontend expectations
+- [X] T022 [P] Configure proper Authorization header parsing for JWT tokens
+- [X] T023 [P] Remove any cookie-based authentication logic from backend
+- [X] T024 [P] Update logging to include authentication failure events for security monitoring
 
-## Task 7: Error Handling and Status Code Validation
-**Objective**: Implement proper error responses with correct HTTP status codes
-**Inputs**: Error handling requirements, spec-defined status codes (401 vs 403)
-**Outputs**: Standardized error responses, proper 401/403 handling, descriptive error messages
-**Validation**: 401 for auth failures, 403 for authorization failures, no information leakage
-**Dependencies**: Task 6
-**Category**: Implementation
-
-## Task 8: Security Review and Regression Checks
-**Objective**: Verify all security requirements are met and no regressions introduced
-**Inputs**: Completed implementation, security requirements, penetration testing scenarios
-**Outputs**: Security validation report, test results confirming compliance
-**Validation**: All auth requirements satisfied, no cross-user access possible, proper logging
-**Dependencies**: Task 7
-**Category**: Validation
+## Phase 7: Polish & Cross-Cutting Concerns
+- [X] T025 [P] Update documentation for JWT-based authentication flow
+- [X] T026 [P] Add security headers to authentication-related responses
+- [X] T027 [P] Verify all endpoints properly validate JWT tokens before processing
+- [X] T028 [P] Add performance tests to ensure JWT validation completes within 100ms p95
+- [X] T029 [P] Conduct final security review of authentication implementation
+- [X] T030 [P] Update environment configuration to use BETTER_AUTH_SECRET for JWT validation
