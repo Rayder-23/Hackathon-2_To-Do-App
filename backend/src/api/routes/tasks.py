@@ -29,8 +29,8 @@ def get_tasks(user_id: str, db: Session = Depends(get_session), jwt_sub: str = D
     Implements FR-010: System MUST ensure users can only access their own tasks and MUST return appropriate HTTP 403 Forbidden errors when unauthorized access is attempted
     Implements FR-023: System MUST filter all responses to include only data owned by authenticated user
     """
-    # Verify user has access to this user_id (compare JWT sub with URL user_id)
-    if not verify_user_access(jwt_sub, str(user_id)):
+    # Enforce user isolation: path user_id must match JWT sub
+    if jwt_sub != str(user_id):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Access denied: You can only access your own tasks"
@@ -38,6 +38,7 @@ def get_tasks(user_id: str, db: Session = Depends(get_session), jwt_sub: str = D
 
     # Convert user_id to int for database operations
     user_id_int = int(user_id)
+    # Enforce ownership at DB layer: only return tasks for authenticated user
     tasks = TaskService.get_tasks_for_user(db, user_id_int)
     return tasks
 
@@ -52,8 +53,8 @@ def create_task(user_id: str, task_data: TaskCreate, db: Session = Depends(get_s
     Implements FR-009: System MUST enforce authentication for all API endpoints with valid JWT tokens
     Implements FR-010: System MUST ensure users can only access their own tasks
     """
-    # Verify user has access to this user_id (compare JWT sub with URL user_id)
-    if not verify_user_access(jwt_sub, str(user_id)):
+    # Enforce user isolation: path user_id must match JWT sub
+    if jwt_sub != str(user_id):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Access denied: You can only create tasks for yourself"
@@ -75,6 +76,7 @@ def create_task(user_id: str, task_data: TaskCreate, db: Session = Depends(get_s
 
     # Convert user_id to int for database operations
     user_id_int = int(user_id)
+    # Enforce ownership at DB layer: create task for authenticated user
     task = TaskService.create_task(db, user_id_int, task_data.title, task_data.description)
     return task
 
@@ -89,8 +91,8 @@ def update_task(user_id: str, task_id: int, task_data: TaskUpdate, db: Session =
     Implements FR-003.1: System MUST return HTTP 400 Bad Request when task title exceeds 255 characters
     Implements FR-003.2: System MUST return HTTP 400 Bad Request when task description exceeds 1000 characters
     """
-    # Verify user has access to this user_id (compare JWT sub with URL user_id)
-    if not verify_user_access(jwt_sub, str(user_id)):
+    # Enforce user isolation: path user_id must match JWT sub
+    if jwt_sub != str(user_id):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Access denied: You can only update your own tasks"
@@ -112,6 +114,7 @@ def update_task(user_id: str, task_id: int, task_data: TaskUpdate, db: Session =
 
     # Convert user_id to int for database operations
     user_id_int = int(user_id)
+    # Enforce ownership at DB layer: update task for authenticated user
     updated_task = TaskService.update_task(
         db, task_id, user_id_int,
         title=task_data.title,
@@ -137,8 +140,8 @@ def delete_task(user_id: str, task_id: int, db: Session = Depends(get_session), 
     Implements FR-009: System MUST enforce authentication for all API endpoints with valid JWT tokens
     Implements FR-010: System MUST ensure users can only access their own tasks
     """
-    # Verify user has access to this user_id (compare JWT sub with URL user_id)
-    if not verify_user_access(jwt_sub, str(user_id)):
+    # Enforce user isolation: path user_id must match JWT sub
+    if jwt_sub != str(user_id):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Access denied: You can only delete your own tasks"
@@ -146,6 +149,7 @@ def delete_task(user_id: str, task_id: int, db: Session = Depends(get_session), 
 
     # Convert user_id to int for database operations
     user_id_int = int(user_id)
+    # Enforce ownership at DB layer: delete task for authenticated user
     success = TaskService.delete_task(db, task_id, user_id_int)
 
     if not success:
@@ -165,8 +169,8 @@ def toggle_task_completion(user_id: str, task_id: int, db: Session = Depends(get
     Implements FR-009: System MUST enforce authentication for all API endpoints with valid JWT tokens
     Implements FR-010: System MUST ensure users can only access their own tasks
     """
-    # Verify user has access to this user_id (compare JWT sub with URL user_id)
-    if not verify_user_access(jwt_sub, str(user_id)):
+    # Enforce user isolation: path user_id must match JWT sub
+    if jwt_sub != str(user_id):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Access denied: You can only toggle completion status of your own tasks"
@@ -174,6 +178,7 @@ def toggle_task_completion(user_id: str, task_id: int, db: Session = Depends(get
 
     # Convert user_id to int for database operations
     user_id_int = int(user_id)
+    # Enforce ownership at DB layer: toggle task for authenticated user
     task = TaskService.toggle_task_completion(db, task_id, user_id_int)
 
     if not task:
@@ -193,8 +198,8 @@ def get_deleted_tasks(user_id: str, db: Session = Depends(get_session), jwt_sub:
     Implements FR-009: System MUST enforce authentication for all API endpoints with valid JWT tokens
     Implements FR-010: System MUST ensure users can only access their own tasks
     """
-    # Verify user has access to this user_id (compare JWT sub with URL user_id)
-    if not verify_user_access(jwt_sub, str(user_id)):
+    # Enforce user isolation: path user_id must match JWT sub
+    if jwt_sub != str(user_id):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Access denied: You can only access your own deleted tasks"
@@ -202,5 +207,6 @@ def get_deleted_tasks(user_id: str, db: Session = Depends(get_session), jwt_sub:
 
     # Convert user_id to int for database operations
     user_id_int = int(user_id)
+    # Enforce ownership at DB layer: get deleted tasks for authenticated user
     deleted_tasks = TaskService.get_deleted_tasks_for_user(db, user_id_int)
     return deleted_tasks

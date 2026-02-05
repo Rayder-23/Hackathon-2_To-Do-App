@@ -35,29 +35,22 @@ def verify_user_access_middleware(
     Checks if URL user_id matches authenticated JWT 'sub' claim.
     Implements FR-022: System MUST reject requests where URL user_id does not match authenticated JWT user identity
     """
-    # Extract user_id from path if it exists
-    path_parts = request.url.path.split('/')
+    # Extract user_id from path - the pattern is /api/{user_id}/tasks
+    path_parts = request.url.path.strip('/').split('/')
 
-    # Look for user_id in the path (e.g., /api/{user_id}/tasks, /users/{user_id}/tasks)
-    for i, part in enumerate(path_parts):
-        if part.isdigit():  # If this part is a number, it might be the user_id
-            # Check if the previous part indicates this is a user resource
-            if i > 0 and path_parts[i-1] in ['users', 'user', 'api']:
-                requested_user_id = part
+    # Look for the user_id in the path (should be after 'api')
+    if 'api' in path_parts:
+        api_index = path_parts.index('api')
+        if api_index + 1 < len(path_parts):
+            # The next part after 'api' should be the user_id
+            requested_user_id = path_parts[api_index + 1]
+
+            # Validate that requested_user_id is numeric
+            if requested_user_id.isdigit():
                 if jwt_sub != requested_user_id:
                     raise HTTPException(
                         status_code=status.HTTP_403_FORBIDDEN,
                         detail="Access denied: You can only access your own resources"
                     )
-                break
-            # Also check for other common patterns like /api/tasks/{user_id}/...
-            elif i < len(path_parts) - 1 and path_parts[i+1] in ['tasks', 'task', 'todos']:
-                requested_user_id = part
-                if jwt_sub != requested_user_id:
-                    raise HTTPException(
-                        status_code=status.HTTP_403_FORBIDDEN,
-                        detail="Access denied: You can only access your own resources"
-                    )
-                break
 
     return jwt_sub
