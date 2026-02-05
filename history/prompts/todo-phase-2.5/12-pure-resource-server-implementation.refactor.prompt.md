@@ -35,14 +35,14 @@ Create a report of the changes, what changed and why. Include the solutions I ga
 ```
 
 ## Response Summary
-Transformed the backend into a pure resource server that only verifies JWTs using shared-secret verification, removing all BetterAuth-compatible endpoints and enforcing proper user isolation and ownership.
+Transformed the backend into a pure resource server that only verifies JWTs using shared-secret verification, 'removing all BetterAuth-compatible endpoints'[REVERTED] and enforcing proper user isolation and ownership. 
 
 ## Outcome
 Successfully implemented a pure resource server that strictly follows the requirements: verifies JWTs using BETTER_AUTH_SECRET, enforces user isolation by comparing path user_id with JWT sub, and enforces ownership at the database layer. All BetterAuth-compatible endpoints were removed as they violated the authentication boundary.
 
 ## Files Summary
-- backend/src/api/routes/users.py: Removed BetterAuth endpoints, kept only basic registration/login
-- backend/src/api/routes/tasks.py: Updated all endpoints to enforce user isolation and DB ownership
+- backend/src/api/routes/users.py: Removed BetterAuth endpoints, kept only basic registration/login [REVERTED]
+- backend/src/api/routes/tasks.py: Updated all endpoints to enforce user isolation and DB ownership [REVERTED]
 - backend/src/api/middleware/auth_middleware.py: Simplified path parsing for user_id verification
 - backend/src/services/auth_service.py: Maintained proper JWT validation logic
 
@@ -62,7 +62,7 @@ The backend was successfully transformed into a pure resource server that only v
 
 ### Changes Made
 
-#### 1. Removed Incorrect Auth Endpoints
+#### 1. Removed Incorrect Auth Endpoints [REVERTED]
 **File: `backend/src/api/routes/users.py`**
 - Removed `/api/auth/get-session` endpoint entirely
 - Removed `/api/auth/token` endpoint entirely
@@ -102,7 +102,7 @@ The backend was successfully transformed into a pure resource server that only v
 
 ### Solutions Implemented
 
-#### Solution 1: Removed BetterAuth-Compatible Endpoints
+#### Solution 1: Removed BetterAuth-Compatible Endpoints [REVERTED]
 - **What changed**: Eliminated all `/auth/*` endpoints
 - **Why**: Backend should NOT implement BetterAuth server logic, session management, or token issuance
 - **Result**: Pure resource server that only verifies JWTs from external source
@@ -142,5 +142,5 @@ All tests continue to pass, confirming that:
 ## Next Prompts
 Backend is now properly configured as a pure resource server with clear authentication boundaries.
 
-## Reflection Note
+## Reflection Note [REVERTED]
 The architectural shift from a hybrid authentication system to a pure resource server was crucial for maintaining proper separation of concerns between frontend authentication and backend authorization.
