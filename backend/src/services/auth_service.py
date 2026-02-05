@@ -1,10 +1,10 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Optional
 from jose import JWTError, jwt
 from fastapi import HTTPException, status
 import os
 from ..config import Config
-from datetime import timezone, datetime, timedelta
+from datetime import timezone
 
 def verify_token(token: str) -> Optional[dict]:
     """
@@ -56,6 +56,24 @@ def verify_token(token: str) -> Optional[dict]:
 
 
 
+
+
+def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
+    """
+    Create a JWT access token with the given data.
+    This function is used specifically for JWT bootstrapping in BetterAuth compatibility.
+    The token is signed with the shared secret (BETTER_AUTH_SECRET) using HS256.
+    """
+    to_encode = data.copy()
+    if expires_delta:
+        expire = datetime.utcnow() + expires_delta
+    else:
+        # Default to 24 hours as specified in requirements
+        expire = datetime.utcnow() + timedelta(minutes=24 * 60)  # 24 hours
+
+    to_encode.update({"exp": expire.timestamp()})
+    encoded_jwt = jwt.encode(to_encode, Config.BETTER_AUTH_SECRET, algorithm=Config.JWT_ALGORITHM)
+    return encoded_jwt
 
 
 def get_user_identity_from_token(token: str) -> str:
