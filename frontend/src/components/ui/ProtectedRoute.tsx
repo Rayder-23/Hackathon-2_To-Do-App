@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { authService } from '@/services/auth-service';
+import { betterAuthService } from '@/services/auth-service';
 import { useRouter } from 'next/navigation';
 import { usePathname } from 'next/navigation';
 
@@ -20,7 +20,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
 
   useEffect(() => {
     const checkAuth = async () => {
-      const authenticated = authService.isAuthenticated();
+      const authenticated = await betterAuthService.isAuthenticated();
       setIsAuthenticated(authenticated);
 
       if (!authenticated) {

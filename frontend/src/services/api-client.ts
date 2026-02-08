@@ -25,7 +25,7 @@ class ApiClient {
     // Add authorization header if token exists
     const authToken = await this.getAuthToken();
     if (authToken) {
-      headers[this.AUTH_HEADER] = `Bearer ${authToken}`;
+      (headers as Record<string, string>)[this.AUTH_HEADER] = `Bearer ${authToken}`;
     }
 
     const config: RequestInit = {
@@ -70,7 +70,7 @@ class ApiClient {
       console.error(`API request failed: ${url}`, error);
 
       // Re-throw the error in a consistent format
-      if (typeof error === 'object' && error.type) {
+      if (typeof error === 'object' && error !== null && 'type' in error) {
         throw error;
       } else {
         throw {
