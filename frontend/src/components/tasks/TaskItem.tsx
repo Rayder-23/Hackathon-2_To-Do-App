@@ -24,7 +24,7 @@ const TaskItem: React.FC<TaskItemProps> = ({ task, onToggle, onDelete, onEdit })
   return (
     <div className={`group relative bg-white rounded-2xl border transition-all duration-300 overflow-hidden hover:shadow-lg ${
       task.completed
-        ? 'border-green-200/70 bg-gradient-to-r from-green-50/30 to-emerald-50/30'
+        ? 'border-green-200/70 bg-linear-to-r from-green-50/30 to-emerald-50/30'
         : 'border-gray-200/50 hover:border-blue-200/60'
     }`}>
       <div className="p-5">
@@ -104,8 +104,8 @@ const TaskItem: React.FC<TaskItemProps> = ({ task, onToggle, onDelete, onEdit })
 
       {/* Progress bar for completed tasks */}
       {task.completed && (
-        <div className="h-1 bg-gradient-to-r from-green-200/50 to-emerald-200/50">
-          <div className="h-full bg-gradient-to-r from-green-500 to-emerald-500 w-full"></div>
+        <div className="h-1 bg-linear-to-r from-green-200/50 to-emerald-200/50">
+          <div className="h-full bg-linear-to-r from-green-500 to-emerald-500 w-full"></div>
         </div>
       )}
     </div>

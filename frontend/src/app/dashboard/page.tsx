@@ -149,22 +149,22 @@ export default function DashboardPage() {
         <div className="mb-10">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
             <div className="flex-1">
-              <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent">
+              <h1 className="text-4xl font-bold bg-linear-to-r from-blue-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent">
                 Task Dashboard
               </h1>
               <p className="text-gray-600 mt-3 text-lg">Manage your tasks efficiently and stay organized</p>
 
               {/* Stats Card */}
               <div className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl p-5 border border-blue-100 shadow-sm">
+                <div className="bg-linear-to-br from-blue-50 to-blue-100 rounded-2xl p-5 border border-blue-100 shadow-sm">
                   <div className="text-blue-800 text-2xl font-bold">{tasks.length}</div>
                   <div className="text-blue-600 text-sm font-medium">Total Tasks</div>
                 </div>
-                <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-2xl p-5 border border-green-100 shadow-sm">
+                <div className="bg-linear-to-br from-green-50 to-green-100 rounded-2xl p-5 border border-green-100 shadow-sm">
                   <div className="text-green-800 text-2xl font-bold">{tasks.filter(t => t.completed).length}</div>
                   <div className="text-green-600 text-sm font-medium">Completed</div>
                 </div>
-                <div className="bg-gradient-to-br from-orange-50 to-orange-100 rounded-2xl p-5 border border-orange-100 shadow-sm">
+                <div className="bg-linear-to-br from-orange-50 to-orange-100 rounded-2xl p-5 border border-orange-100 shadow-sm">
                   <div className="text-orange-800 text-2xl font-bold">{tasks.filter(t => !t.completed).length}</div>
                   <div className="text-orange-600 text-sm font-medium">Pending</div>
                 </div>
@@ -173,7 +173,7 @@ export default function DashboardPage() {
 
             <button
               onClick={handleAddTask}
-              className="px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-2xl hover:from-blue-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200 font-semibold shadow-lg hover:shadow-xl flex items-center justify-center space-x-3 min-w-fit transform hover:-translate-y-0.5 active:translate-y-0"
+              className="px-8 py-4 bg-linear-to-r from-blue-600 to-purple-600 text-white rounded-2xl hover:from-blue-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200 font-semibold shadow-lg hover:shadow-xl flex items-center justify-center space-x-3 min-w-fit transform hover:-translate-y-0.5 active:translate-y-0"
             >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
@@ -204,7 +204,7 @@ export default function DashboardPage() {
         {error && (
           <div className="mb-8 bg-red-50 border-l-4 border-red-500 p-5 rounded-2xl animate-in slide-in-from-right-4 duration-300 shadow-sm">
             <div className="flex items-start">
-              <div className="flex-shrink-0 pt-0.5">
+              <div className="shrink-0 pt-0.5">
                 <svg className="h-6 w-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
