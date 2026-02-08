@@ -1,4 +1,15 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# TodoFlow - Task Management Application
+
+TodoFlow is a modern task management application built with Next.js, featuring secure authentication with BetterAuth and a FastAPI backend. The application allows users to create, manage, and track their tasks with a clean, intuitive interface.
+
+## Features
+
+- User authentication and authorization with BetterAuth
+- Task creation, editing, and deletion
+- Task completion tracking
+- Responsive design for all device sizes
+- Secure JWT-based authentication
+- Modern UI with gradient backgrounds and smooth animations
 
 ## Getting Started
 
@@ -19,6 +30,16 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+
+## Environment Variables
+
+Create a `.env.local` file in the root of the frontend directory with the following variables:
+
+```env
+NEXT_PUBLIC_BETTER_AUTH_URL=http://localhost:3000
+NEXT_PUBLIC_API_BASE_URL=http://localhost:8000
+BETTER_AUTH_SECRET=your-super-secret-jwt-signing-key-here-make-it-long-and-random
+```
 
 ## Learn More
 

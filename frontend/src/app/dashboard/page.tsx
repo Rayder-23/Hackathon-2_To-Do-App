@@ -130,7 +130,14 @@ export default function DashboardPage() {
   if (!currentUserId) {
     return (
       <div className="flex justify-center items-center h-screen">
-        <p>Redirecting to login...</p>
+        <div className="flex items-center">
+          <p>Redirecting to login</p>
+          <div className="ml-2 flex space-x-1">
+            <div className="w-2 h-2 bg-gray-600 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+            <div className="w-2 h-2 bg-gray-600 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+            <div className="w-2 h-2 bg-gray-600 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+          </div>
+        </div>
       </div>
     );
   }
